@@ -1,8 +1,8 @@
 # k8s-notify
 
-Watches for Kubernetes Deployments and posts status updates to one more more Flowdock chatrooms based on team.
+Watches for Kubernetes Deployments and posts status updates to one or more Flowdock chat rooms based on team.
 
-Teams and identified by reading `app.mintel.com/k8s-notify` annotations from the deployment, and to the desired flowdock room based on configuration.
+Teams are identified by reading `app.mintel.com/k8s-notify` annotations from the deployment, and to the desired flowdock room based on configuration.
 
 ## Usage
 
@@ -25,20 +25,15 @@ receivers:
       token: "{FLOWDOCK_TOKEN_SRE}"
 ```
 
-You can specify multiple receivers as well as multiple team/channels.
+You can specify multiple teams if required.
 
 Notifications will be sent to all matching routes.
 
-**Environment Var Support**
+Note that environment variables are supported in the config (as in the above example).
 
-The config file supports Python's string formatting.
-
-This is supported for any yaml value.
-
-### Deployment Annotations
+### Annotations
 
 Enabling notifications for deployments is done through the use of annotations.
-
 
 ```yaml
 apiVersion: apps/v1
