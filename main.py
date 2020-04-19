@@ -1,0 +1,121 @@
+import yaml
+import os
+import sys
+import argparse
+
+from kubernetes import watch, client, config
+
+from receivers.flowdock_receiver import FlowdockReceiver
+from utils import ANNOTATION_ENABLED, \
+    ANNOTATION_TEAM, \
+    ANNOTATION_RECEIVER
+
+
+#
+# Define a specific yaml loader which substitutes environment
+# vars.
+#
+class YamlEnvLoader(yaml.SafeLoader):
+    def construct_yaml_str(self, node):
+        return self.construct_scalar(node).format(**os.environ)
+
+
+YamlEnvLoader.add_constructor(
+    'tag:yaml.org,2002:str',
+    YamlEnvLoader.construct_yaml_str)
+
+
+def main_loop(receivers):
+
+    if "KUBERNETES_PORT" in os.environ:
+        config.load_incluster_config()
+    else:
+        config.load_kube_config()
+    api_client = client.api_client.ApiClient()
+    core = client.AppsV1Api(api_client)
+
+    event_types = ['ADDED', 'MODIFIED']
+
+    while True:
+
+        pods = core.list_deployment_for_all_namespaces(watch=False)
+        resource_version = pods.metadata.resource_version
+        stream = watch.Watch().stream(core.list_deployment_for_all_namespaces,
+                                      resource_version=resource_version)
+        for event in stream:
+            # Event type
+            # ADDED | MODIFIED | DELETED
+            event_type = event['type']
+            deployment = event['object']
+
+            # We only care about new/updated events (for now)
+            if event_type not in event_types:
+                continue
+
+            # Parse out annotations
+            annotations = deployment.metadata.annotations
+
+            # Skip if we have none - this generally means the deployment does not
+            # exist.
+            if not annotations:
+                continue
+
+            # Skip watching this deployment unless we've enabled it explicity
+            if annotations.get(ANNOTATION_ENABLED) != "true":
+                continue
+
+            # Get team routing information from annotation
+            annotation_team = annotations.get(ANNOTATION_TEAM)
+            annotation_receiver = annotations.get(ANNOTATION_RECEIVER)
+
+            for receiver in receivers:
+                receiver.handle_event(annotation_team,
+                                      annotation_receiver,
+                                      deployment)
+
+
+def format_constructor(loader, node):
+    return loader.construct_scalar(node).format(**os.environ)
+
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--config', required=True,
+                        help='path to configuration file')
+
+    args = parser.parse_args()
+
+    config_file = args.config
+
+    if not os.path.exists(config_file):
+        print("Config not found: %s" % (config_file))
+        sys.exit(1)
+
+    print("Using config: %s" % (config_file))
+
+    with open(config_file, 'r') as ymlfile:
+        yaml_loader = YamlEnvLoader(ymlfile)
+        try:
+            yaml_config = yaml_loader.get_single_data()
+        finally:
+            yaml_loader.dispose()
+
+    cluster_name = yaml_config.get("cluster_name",
+                                   os.environ.get("CLUSTER_NAME",
+                                                  "Kubernetes Cluster"))
+
+    receivers = []
+
+    flowdock_settings = yaml_config.get("receivers", {}).get("flowdock", {})
+
+    for team, settings in flowdock_settings.items():
+        receivers.append(FlowdockReceiver(cluster_name,
+                                          team,
+                                          settings.get("token")))
+
+    if not receivers:
+        print("No valid receivers defined in config.yml")
+        sys.exit(1)
+
+    main_loop(receivers)

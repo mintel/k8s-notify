@@ -1,0 +1,14 @@
+apiVersion: v1
+data:
+  config.yml: |+
+    ---
+    cluster_name: "Kubernetes Cluster"
+    receivers:
+      flowdock:
+        myteam:
+          token: "{FLOWDOCK_TOKEN}"
+
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: k8s-notify

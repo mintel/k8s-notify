@@ -1,0 +1,37 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-notify
+  labels:
+    app: k8s-notify
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-notify
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: k8s-notify
+    spec:
+      serviceAccount: k8s-notify
+      containers:
+      - name: k8s-notify
+        image: nabadger/k8s-notify:latest
+        args: ["--config", "/etc/k8s-notify/config.yml"]
+        envFrom:
+        - secretRef:
+            name: k8s-notify
+        volumeMounts:
+        - name: config
+          mountPath: /etc/k8s-notify
+      volumes  :
+      - name: config
+        configMap:
+          name: k8s-notify
+      - name: credentials
+        secret:
+          secretName: k8s-notify

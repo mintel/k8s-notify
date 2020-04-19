@@ -1,0 +1,9 @@
+---
+cluster_name: "Kubernetes Cluster"
+receivers:
+  flowdock:
+    myteam:
+      token: "{FLOWDOCK_TOKEN}"
+    myteam2:
+      token: "{FLOWDOCK_TOKEN}"
+
