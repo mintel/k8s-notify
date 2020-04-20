@@ -73,16 +73,18 @@ class FlowdockReceiver(Receiver):
         )
 
         flow_message = (
-            f"{message_status}</br>{message_reason}i"
+            f"{message_status}</br>{message_reason}"
             f"</br></br>"
             f"{message_summary}"
             f"</br></br>"
         )
 
+        flow_message = +"<ul>"
         for container in deployment.spec.template.spec.containers:
             flow_message += (
                 f"<li>Container '{container.name}' has image " f"{container.image}</li>"
             )
+        flow_message = +"</ul>"
 
         if self.rollout_complete(rollout_status):
             links = [
