@@ -6,9 +6,7 @@ import argparse
 from kubernetes import watch, client, config
 
 from receivers.flowdock_receiver import FlowdockReceiver
-from utils import ANNOTATION_ENABLED, \
-    ANNOTATION_TEAM, \
-    ANNOTATION_RECEIVER
+from utils import ANNOTATION_ENABLED, ANNOTATION_TEAM, ANNOTATION_RECEIVER
 
 
 #
@@ -20,9 +18,7 @@ class YamlEnvLoader(yaml.SafeLoader):
         return self.construct_scalar(node).format(**os.environ)
 
 
-YamlEnvLoader.add_constructor(
-    'tag:yaml.org,2002:str',
-    YamlEnvLoader.construct_yaml_str)
+YamlEnvLoader.add_constructor("tag:yaml.org,2002:str", YamlEnvLoader.construct_yaml_str)
 
 
 def main_loop(receivers):
@@ -34,19 +30,20 @@ def main_loop(receivers):
     api_client = client.api_client.ApiClient()
     core = client.AppsV1Api(api_client)
 
-    event_types = ['ADDED', 'MODIFIED']
+    event_types = ["ADDED", "MODIFIED"]
 
     while True:
 
         pods = core.list_deployment_for_all_namespaces(watch=False)
         resource_version = pods.metadata.resource_version
-        stream = watch.Watch().stream(core.list_deployment_for_all_namespaces,
-                                      resource_version=resource_version)
+        stream = watch.Watch().stream(
+            core.list_deployment_for_all_namespaces, resource_version=resource_version
+        )
         for event in stream:
             # Event type
             # ADDED | MODIFIED | DELETED
-            event_type = event['type']
-            deployment = event['object']
+            event_type = event["type"]
+            deployment = event["object"]
 
             # We only care about new/updated events (for now)
             if event_type not in event_types:
@@ -69,9 +66,7 @@ def main_loop(receivers):
             annotation_receiver = annotations.get(ANNOTATION_RECEIVER)
 
             for receiver in receivers:
-                receiver.handle_event(annotation_team,
-                                      annotation_receiver,
-                                      deployment)
+                receiver.handle_event(annotation_team, annotation_receiver, deployment)
 
 
 def format_constructor(loader, node):
@@ -81,8 +76,7 @@ def format_constructor(loader, node):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', required=True,
-                        help='path to configuration file')
+    parser.add_argument("--config", required=True, help="path to configuration file")
 
     args = parser.parse_args()
 
@@ -94,25 +88,23 @@ if __name__ == "__main__":
 
     print("Using config: %s" % (config_file))
 
-    with open(config_file, 'r') as ymlfile:
+    with open(config_file, "r") as ymlfile:
         yaml_loader = YamlEnvLoader(ymlfile)
         try:
             yaml_config = yaml_loader.get_single_data()
         finally:
             yaml_loader.dispose()
 
-    cluster_name = yaml_config.get("cluster_name",
-                                   os.environ.get("CLUSTER_NAME",
-                                                  "Kubernetes Cluster"))
+    cluster_name = yaml_config.get(
+        "cluster_name", os.environ.get("CLUSTER_NAME", "Kubernetes Cluster")
+    )
 
     receivers = []
 
     flowdock_settings = yaml_config.get("receivers", {}).get("flowdock", {})
 
     for team, settings in flowdock_settings.items():
-        receivers.append(FlowdockReceiver(cluster_name,
-                                          team,
-                                          settings.get("token")))
+        receivers.append(FlowdockReceiver(cluster_name, team, settings.get("token")))
 
     if not receivers:
         print("No valid receivers defined in config.yml")
