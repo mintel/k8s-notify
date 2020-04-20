@@ -1,8 +1,11 @@
 # k8s-notify
 
-Watches for Kubernetes Deployments and posts status updates to one or more Flowdock chat rooms based on team.
+Watches for Kubernetes Deployments and posts status updates to one or more Flowdock chat rooms.
 
-Teams are identified by reading `app.mintel.com/k8s-notify` annotations from the deployment, and to the desired flowdock room based on configuration.
+Notifications are controlled by adding annotations to Deployments.
+
+- Supports notifications on specific deployments
+- Supports notifications to different flows based on team
 
 ## Usage
 
@@ -11,11 +14,17 @@ pipenv install
 pipenv run python k8s-notify.py --config <path-to-config.yml>
 ```
 
+### Kubernetes
+
+`k8s-notify` is intended to be deployed inside a Kubernetes Cluster.
+
+Example manifests can be found [here](./deploy/)
+
 ## Configuration
 
-See the [example-config](./hack/config.example.yml) 
+See the example-config [here](./hack/config.example.yml) 
+
 ```yaml
----
 cluster_name: "Kubernetes Cluster"
 receivers:
   flowdock:
@@ -25,15 +34,15 @@ receivers:
       token: "{FLOWDOCK_TOKEN_SRE}"
 ```
 
-You can specify multiple teams if required.
+This example defines a `flowdock` receiver (currently the only type supported), and two teams *cluster_ops* and *sre*.
 
-Notifications will be sent to all matching routes.
+Annotations on the deployment matching the teams will be routed to the flowdock room identified by the injected flowdock-token.
 
-Note that environment variables are supported in the config (as in the above example).
+Environment variables are supported in the config (see above example).
 
 ### Annotations
 
-Enabling notifications for deployments is done through the use of annotations.
+Enabling notifications for Deployments is managed through the use of annotations.
 
 ```yaml
 apiVersion: apps/v1
@@ -49,3 +58,5 @@ metadata:
     app.mintel.com/k8s-notify.monitoring-url: https://monitoring-url
     app.mintel.com/k8s-notify.health-status-url: https://heatlh-status-url
 ```
+
+The `-url` annotations are optional. If specified, they will be included in the notification.
