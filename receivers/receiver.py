@@ -78,7 +78,9 @@ class Receiver(object):
         if condition.reason == "ReplicaFailure":
             return self._ROLLOUT_FAILED
 
-        if num_replicas_desired == num_replicas_ready:
+        if (
+            num_replicas_desired == num_replicas_ready
+        ) and num_replicas_unavailable == 0:
             return self._ROLLOUT_COMPLETE
 
         if (
