@@ -55,6 +55,7 @@ metadata:
     app.mintel.com/k8s-notify.receiver: flowdock
     app.mintel.com/k8s-notify.vcs-url: https://vcs-url
     app.mintel.com/k8s-notify.public-url: https://public-facing-url
+    app.mintel.com/k8s-notify.logs-url: https://logs-url
     app.mintel.com/k8s-notify.monitoring-url: https://monitoring-url
     app.mintel.com/k8s-notify.health-status-url: https://heatlh-status-url
 ```

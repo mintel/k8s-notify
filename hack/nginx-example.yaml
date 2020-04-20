@@ -8,6 +8,7 @@ metadata:
     app.mintel.com/k8s-notify.public-url: "https://google.com/?q=pubic"
     app.mintel.com/k8s-notify.vcs-url: "https://google.com/?q=vcs"
     app.mintel.com/k8s-notify.health-status-url: "https://google.com/?q=healthz"
+    app.mintel.com/k8s-notify.logs-url: "https://google.com/?q=logs"
     app.mintel.com/k8s-notify.monitoring-url: "https://google.com/?q=monitoring"
   labels:
     run: nginx

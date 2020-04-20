@@ -1,5 +1,6 @@
 from utils import (
     ANNOTATION_PUBLIC_URL,
+    ANNOTATION_LOGS_URL,
     ANNOTATION_MONITORING_URL,
     ANNOTATION_HEALTH_STATUS_URL,
     ANNOTATION_VCS_URL,
@@ -45,6 +46,9 @@ class Receiver(object):
 
     def public_url(self, annotations):
         return annotations.get(ANNOTATION_PUBLIC_URL)
+
+    def logs_url(self, annotations):
+        return annotations.get(ANNOTATION_LOGS_URL)
 
     def monitoring_url(self, annotations):
         return annotations.get(ANNOTATION_MONITORING_URL)

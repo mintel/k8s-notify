@@ -88,6 +88,7 @@ class FlowdockReceiver(Receiver):
         if self.rollout_complete(rollout_status):
             links = [
                 ("Public URL", self.public_url(annotations)),
+                ("Logs URL", self.logs_url(annotations)),
                 ("Monitoring URL", self.monitoring_url(annotations)),
                 ("Health Status URL", self.health_status_url(annotations)),
                 ("VCS URL", self.vcs_url(annotations)),
