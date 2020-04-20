@@ -108,7 +108,6 @@ class Receiver(object):
         num_replicas_current = status.replicas or 0
         num_replicas_available = status.available_replicas or 0
         num_replicas_unavailable = status.unavailable_replicas or 0
-        num_replicas_not_ready = num_replicas_ready - num_replicas_current
 
         last_condition = deployment.status.conditions[-1]
 
