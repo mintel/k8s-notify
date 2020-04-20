@@ -6,14 +6,17 @@ ARG VCS_REF
 RUN echo $BUILD_DATE
 RUN echo $VCS_REF
 
-LABEL org.label-schema.build-date=$BUILD_DATE \
-      org.label-schema.vcs-ref=$VCS_REF \
-      org.label-schema.vcs-url="https://github.com/mintel/k8s-notify.git" \
-      org.label-schema.schema-version="0.1.0" \
-      org.label-schema.name="k8s-notify" \
-      org.label-schema.description="Post Kubernetes Deployment Status To Flowdock" \
-      org.label-schema.vendor="Mintel Group Ltd." \
-      maintainer="Nick Badger <nbadger@mintel.com>"
+LABEL maintainer="Nick Badger <nbadger@mintel.com>" \
+      org.opencontainers.image.title="k8s-notify" \
+      org.opencontainers.image.description="Post Kubernetes Deployment Status To Flowdock" \
+      org.opencontainers.url="https://github.com/mintel/k8s-notify" \
+      org.opencontainers.source="https://github.com/mintel/k8s-notify.git" \
+      org.opencontainers.image.version="0.1.0" \
+      org.opencontainers.image.vendor="Mintel Group Ltd." \
+      org.opencontainers.image.licences="MIT" \
+      org.opencontainers.authors="Nick Badger <nbadger@mintel.com>" \
+      org.opencontainers.image.created="$BUILD_DATE" \
+      org.opencontainers.image.revision="$VCS_REF"
 
 WORKDIR /app
 COPY . ./
