@@ -37,7 +37,7 @@ def main_loop(receivers):
         pods = core.list_deployment_for_all_namespaces(watch=False)
         resource_version = pods.metadata.resource_version
         stream = watch.Watch().stream(
-            core.list_deployment_for_all_namespaces, resource_version=resource_version
+            core.list_deployment_for_all_namespaces, resource_version=resource_version,
         )
         for event in stream:
             # Event type
@@ -52,8 +52,8 @@ def main_loop(receivers):
             # Parse out annotations
             annotations = deployment.metadata.annotations
 
-            # Skip if we have none - this generally means the deployment does not
-            # exist.
+            # Skip if we have none - this generally means the deployment
+            # does not exist.
             if not annotations:
                 continue
 

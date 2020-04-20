@@ -9,14 +9,14 @@ class FlowdockReceiver(Receiver):
     NAME = "flowdock"
 
     template = {
-        "author": {"name": "KubeLookout",},
+        "author": {"name": "KubeLookout"},
         "title": "Title",
         "external_thread_id": "Item-1",
         "thread": {
             "title": "thread-title",
             "body": "body-html",
             "external_url": "",
-            "status": {"value": "Deploying...", "color": "red",},
+            "status": {"value": "Deploying...", "color": "red"},
         },
     }
 
@@ -40,7 +40,7 @@ class FlowdockReceiver(Receiver):
         if message_id is None:
             # Send a new message
             self.flowdock_client.present(
-                item_id, author=author, title=title, body=item["body"], thread=item
+                item_id, author=author, title=title, body=item["body"], thread=item,
             )
             return item_id, item_id
 
@@ -67,11 +67,17 @@ class FlowdockReceiver(Receiver):
         annotations = deployment.metadata.annotations
 
         flow_header = (
-            f"[{num_replicas_ready}/{num_replicas_desired}] [{self.cluster_name.upper()}] "
+            f"[{num_replicas_ready}/{num_replicas_desired}] "
+            f"[{self.cluster_name.upper()}] "
             f"[{deployment.metadata.namespace}/{deployment.metadata.name}]"
         )
 
-        flow_message = f"{message_status}</br>{message_reason}</br></br>{message_summary}</br></br>"
+        flow_message = (
+            f"{message_status}</br>{message_reason}i"
+            f"</br></br>"
+            f"{message_summary}"
+            f"</br></br>"
+        )
 
         for container in deployment.spec.template.spec.containers:
             flow_message += (

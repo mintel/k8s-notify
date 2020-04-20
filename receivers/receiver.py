@@ -89,7 +89,7 @@ class Receiver(object):
         metadata = deployment.metadata
         status = deployment.status
         deployment_key = (
-            f"{status.observed_generation}/{metadata.namespace}/{metadata.name}"
+            f"{status.observed_generation}/" f"{metadata.namespace}/" f"{metadata.name}"
         )
 
         previous_generation = self.rollouts_previous_generation.get(deployment_key, 0)
