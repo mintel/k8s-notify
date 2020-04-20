@@ -9,7 +9,7 @@ class FlowdockReceiver(Receiver):
     NAME = "flowdock"
 
     template = {
-        "author": {"name": "KubeLookout"},
+        "author": {"name": "k8s-notify"},
         "title": "Title",
         "external_thread_id": "Item-1",
         "thread": {
