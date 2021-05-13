@@ -27,4 +27,4 @@ RUN pip install pipenv \
 
 USER 65534
 ENTRYPOINT  [ "python", "-u", "/app/main.py" ]
-CMD [ "--config=/etc/k8s-notify/config.yml "]
+CMD [ "--config=/etc/k8s-notify/config.yml" ]
